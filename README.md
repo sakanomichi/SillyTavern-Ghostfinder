@@ -38,7 +38,7 @@ Enable "Show Boundary Panel" in the extension settings to change the candle butt
 
 Or manually place the extension folder in:
 ```
-public/scripts/extensions/third-party/ghostfinder/
+public/scripts/extensions/third-party/SillyTavern-Ghostfinder/
 ```
 
 ## Settings
@@ -55,5 +55,4 @@ Find Ghostfinder in the Extensions panel (right sidebar):
 - Navigate back to boundary points after using `/hide` or `/unhide` commands on a range of messages
 
 ## Credits
-
-Created by sakanomichi
+Created by sakanomichi using tools created by cha1latte
