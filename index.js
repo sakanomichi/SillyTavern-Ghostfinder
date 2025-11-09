@@ -199,14 +199,18 @@ function addLanternButton() {
     console.log(`[${extensionName}] Lantern button added`);
 }
 
+// Create sidebar panel
 function createSidebar() {
+    // Check if sidebar is currently open before removing
+    const wasOpen = $('#ghostfinder_sidebar').hasClass('ghostfinder_open');
+    
     // Remove existing sidebar if any
     $('#ghostfinder_sidebar').remove();
     
     // Always create sidebar - don't check enabled setting
     
     const sidebar = $(`
-        <div id="ghostfinder_sidebar" class="ghostfinder_sidebar">
+        <div id="ghostfinder_sidebar" class="ghostfinder_sidebar ${wasOpen ? 'ghostfinder_open' : ''}">
             <div class="ghostfinder_sidebar_header">
                 <h3>Boundary Messages</h3>
                 <div class="ghostfinder_sidebar_controls">
@@ -222,6 +226,11 @@ function createSidebar() {
     
     $('#ghostfinder_sidebar_close').on('click', closeSidebar);
     $('#ghostfinder_sidebar_refresh').on('click', updateSidebarPanel);
+    
+    // If it was open, update the panel content
+    if (wasOpen) {
+        updateSidebarPanel();
+    }
     
     // Update when chat changes
     eventSource.on(event_types.CHAT_CHANGED, updateSidebarPanel);
