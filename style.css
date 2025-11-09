@@ -48,16 +48,31 @@
     font-weight: 600;
 }
 
+.ghostfinder_sidebar_controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+#ghostfinder_sidebar_refresh,
 #ghostfinder_sidebar_close {
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 1rem;
     opacity: 0.7;
     transition: opacity 0.2s, color 0.2s;
     color: var(--SmartThemeQuoteColor);
 }
 
+#ghostfinder_sidebar_refresh:hover,
 #ghostfinder_sidebar_close:hover {
     opacity: 1;
+}
+
+#ghostfinder_sidebar_refresh:hover {
+    color: var(--SmartThemeQuoteColor);
+}
+
+#ghostfinder_sidebar_close:hover {
     color: var(--crimson70a);
 }
 
@@ -76,11 +91,20 @@
     transition: background 0.2s, opacity 0.2s;
     text-align: center;
     color: var(--SmartThemeQuoteColor);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .ghostfinder_boundary_item:hover {
     background: var(--SmartThemeBorderColor);
     opacity: 0.9;
+}
+
+.ghostfinder_ghost_icon {
+    font-size: 0.9rem;
+    opacity: 0.8;
 }
 
 .ghostfinder_no_boundaries {
