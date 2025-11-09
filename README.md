@@ -12,9 +12,9 @@ Hidden messages are denoted with a ghost icon. I thought this would be cute.
 
 ## Features
 
-### 🕯️ Candle Button (Default Mode)
+### 🕯 Lantern Button (Default Mode)
 
-A candle button appears in your chat interface. Click it to:
+A lantern button appears in your chat interface. Click it to:
 
 1. **Jump to previous boundary** - Scrolls to the most recent boundary message before your current position
 2. **Click again** to find earlier boundaries - Each click takes you to the next boundary up in the conversation
@@ -22,9 +22,9 @@ A candle button appears in your chat interface. Click it to:
 
 ### 📋 Boundary Panel (Optional)
 
-Enable "Show Boundary Panel" in the extension settings to change the candle button's behavior:
+Enable "Show Boundary Panel" in the extension settings to change the lantern button's behavior:
 
-- **Click the candle** to open a sidebar panel showing *all* boundary messages in the current chat
+- **Click the lantern** to open a sidebar panel showing *all* boundary messages in the current chat
 - **Click any message number** in the panel to jump directly to that boundary
 - The panel stays open as you navigate, so you can jump between multiple boundaries easily
 - **Close button** in the top-right corner of the panel
@@ -46,7 +46,7 @@ public/scripts/extensions/third-party/SillyTavern-Ghostfinder/
 Find Ghostfinder in the Extensions panel (right sidebar):
 
 - **Enable Ghostfinder** - Turns the extension on/off
-- **Show Boundary Panel** - When enabled, the candle button opens a panel listing all boundaries instead of jumping to the previous one
+- **Show Boundary Panel** - When enabled, the lantern button opens a panel listing all boundaries instead of jumping to the previous one
 
 ## Use Cases
 
@@ -55,4 +55,5 @@ Find Ghostfinder in the Extensions panel (right sidebar):
 - Navigate back to boundary points after using `/hide` or `/unhide` commands on a range of messages
 
 ## Credits
+
 Created by sakanomichi using tools created by cha1latte
