@@ -77,7 +77,9 @@ function jumpToBoundary(mesId) {
         targetElement[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
         toastr.success(`Jumped to message #${mesId}`, 'Ghostfinder');
     } else {
-        toastr.warning(`Message #${mesId} not loaded. Scroll up to load more messages.`, 'Ghostfinder');
+        // Message not loaded - scroll to top to load more messages
+        $('#chat').animate({ scrollTop: 0 }, 'smooth');
+        toastr.info(`Message #${mesId} not loaded. Scrolled to top - click "Show More Messages" to load earlier messages.`, 'Ghostfinder');
     }
 }
 
