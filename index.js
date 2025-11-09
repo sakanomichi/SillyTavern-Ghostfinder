@@ -74,11 +74,18 @@ function jumpToBoundary(mesId) {
     const targetElement = $(`.mes[mesid="${mesId}"]`);
     
     if (targetElement.length > 0) {
-        targetElement[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Use jQuery animate instead of scrollIntoView to prevent layout issues
+        const chatContainer = $('#chat');
+        const targetOffset = targetElement.offset().top - chatContainer.offset().top + chatContainer.scrollTop();
+        
+        chatContainer.animate({
+            scrollTop: targetOffset - 100 // Offset by 100px to give some breathing room
+        }, 500, 'swing');
+        
         toastr.success(`Jumped to message #${mesId}`, 'Ghostfinder');
     } else {
         // Message not loaded - scroll to top to load more messages
-        $('#chat').animate({ scrollTop: 0 }, 'smooth');
+        $('#chat').animate({ scrollTop: 0 }, 500, 'swing');
         toastr.info(`Message #${mesId} not loaded. Scrolled to top - click "Show More Messages" to load earlier messages.`, 'Ghostfinder');
     }
 }
