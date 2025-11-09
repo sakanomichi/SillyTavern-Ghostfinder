@@ -70,8 +70,9 @@ Find Ghostfinder in the Extensions panel (right sidebar):
 
 ## Credits
 
-Created by sakanomichi using tools created by cha1latte
+Created by sakanomichi using tools created by Chai/Ultraviolenc!
 
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for version history and detailed changes.
+
