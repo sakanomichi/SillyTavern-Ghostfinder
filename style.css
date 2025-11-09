@@ -1,0 +1,92 @@
+#ghostfinder_button {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+#ghostfinder_button:hover {
+    opacity: 1;
+}
+
+/* Sidebar styles */
+.ghostfinder_sidebar {
+    position: fixed;
+    left: -20rem;
+    top: 10vh;
+    width: 18rem;
+    max-height: 80vh;
+    background: var(--SmartThemeBlurTintColor);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: left 0.3s ease;
+    z-index: 4000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--SmartThemeQuoteColor);
+}
+
+.ghostfinder_sidebar.ghostfinder_open {
+    left: 1rem;
+}
+
+.ghostfinder_sidebar_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--SmartThemeBorderColor);
+    flex-shrink: 0;
+    background: var(--black30a);
+}
+
+.ghostfinder_sidebar_header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--SmartThemeQuoteColor);
+    font-weight: 600;
+}
+
+#ghostfinder_sidebar_close {
+    cursor: pointer;
+    font-size: 1.2rem;
+    opacity: 0.7;
+    transition: opacity 0.2s, color 0.2s;
+    color: var(--SmartThemeQuoteColor);
+}
+
+#ghostfinder_sidebar_close:hover {
+    opacity: 1;
+    color: var(--crimson70a);
+}
+
+.ghostfinder_sidebar_list {
+    padding: 0.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.ghostfinder_boundary_item {
+    padding: 0.75rem;
+    margin: 0.25rem 0;
+    cursor: pointer;
+    border-radius: 5px;
+    background: var(--black50a);
+    transition: background 0.2s, opacity 0.2s;
+    text-align: center;
+    color: var(--SmartThemeQuoteColor);
+}
+
+.ghostfinder_boundary_item:hover {
+    background: var(--SmartThemeBorderColor);
+    opacity: 0.9;
+}
+
+.ghostfinder_no_boundaries {
+    padding: 1rem;
+    text-align: center;
+    opacity: 0.6;
+    font-style: italic;
+    color: var(--SmartThemeQuoteColor);
+}
