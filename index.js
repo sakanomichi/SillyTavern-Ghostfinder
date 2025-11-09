@@ -7,7 +7,7 @@ const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
 const defaultSettings = { 
     enabled: true,
-    showIndex: true
+    showIndex: false
 };
 
 // Find ALL boundary messages from context.chat (includes unloaded)
@@ -158,7 +158,6 @@ function addLanternButton() {
     $('#rightSendForm').prepend(button);
     
     console.log(`[${extensionName}] Lantern button added`);
-}
 }
 
 // Create sidebar panel
