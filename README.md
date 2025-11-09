@@ -4,11 +4,11 @@ A SillyTavern extension that helps you navigate between "boundary messages" - th
 
 ## What are Boundary Messages?
 
-When you hide messages in SillyTavern (system messages, swipes, etc.), "boundary messages" are the first visible messages that come after those hidden sections. Ghostfinder helps you quickly navigate to these boundaries, making it easy to jump between different conversation segments.
+When you hide messages in SillyTavern (system messages, OOC messages, etc.), "boundary messages" are the first visible messages that come after those hidden sections. Ghostfinder helps you quickly navigate to these boundaries, making it easy to jump between different conversation segments.
 
 ## Why Ghostfinder?
 
-Hidden messages are denoted with a ghost icon. I thought this would be cute.
+Hidden messages are denoted with a ghost icon. I thought a ghostfinding lantern would be cute. 👻
 
 ## Features
 
@@ -18,16 +18,17 @@ A lantern button appears in your chat interface. Click it to:
 
 1. **Jump to previous boundary** - Scrolls to the most recent boundary message before your current position
 2. **Click again** to find earlier boundaries - Each click takes you to the next boundary up in the conversation
-3. **Pagination aware** - If there are boundaries in messages that aren't loaded yet (beyond SillyTavern's default 100-message limit), you'll get a notification to scroll up and load more messages
+3. **Pagination aware** - If there are boundaries in messages that aren't loaded yet (beyond SillyTavern's default 100-message pagination limit), you'll get a notification to scroll up and load more messages
 
 ### 📋 Boundary Panel (Optional)
 
-Enable "Show Boundary Panel" in the extension settings to change the lantern button's behavior:
+Enable "Show Boundary Panel" in the extension settings to change the lantern button's behaviour:
 
 - **Click the lantern** to open a sidebar panel showing *all* boundary messages in the current chat
 - **Click any message number** in the panel to jump directly to that boundary
 - The panel stays open as you navigate, so you can jump between multiple boundaries easily
 - **Close button** in the top-right corner of the panel
+- **Refresh button** will update to the current state of the boundary messages
 
 ## Installation
 
@@ -45,8 +46,8 @@ public/scripts/extensions/third-party/SillyTavern-Ghostfinder/
 
 Find Ghostfinder in the Extensions panel (right sidebar):
 
-- **Enable Ghostfinder** - Turns the extension on/off
-- **Show Boundary Panel** - When enabled, the lantern button opens a panel listing all boundaries instead of jumping to the previous one
+- **Enable Ghostfinder** - On by default, turns the extension on/off
+- **Show Boundary Panel** - Off by default, when enabled the lantern button opens a panel listing all boundaries instead of jumping to the previous one
 
 ## Use Cases
 
@@ -57,3 +58,4 @@ Find Ghostfinder in the Extensions panel (right sidebar):
 ## Credits
 
 Created by sakanomichi using tools created by cha1latte
+
