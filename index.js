@@ -96,9 +96,12 @@ function updateSidebarPanel() {
     }
     
     boundaries.forEach(mesId => {
-        const item = $('<div class="ghostfinder_boundary_item menu_button"></div>')
-            .text(`Message #${mesId}`)
-            .on('click', () => jumpToBoundary(mesId));
+        const item = $('<div class="ghostfinder_boundary_item menu_button"></div>');
+        const ghostIcon = $('<i class="fa-solid fa-ghost ghostfinder_ghost_icon"></i>');
+        const text = $('<span></span>').text(`Message #${mesId}`);
+        
+        item.append(ghostIcon).append(text);
+        item.on('click', () => jumpToBoundary(mesId));
         listContainer.append(item);
     });
 }
@@ -173,7 +176,10 @@ function createSidebar() {
         <div id="ghostfinder_sidebar" class="ghostfinder_sidebar">
             <div class="ghostfinder_sidebar_header">
                 <h3>Boundary Messages</h3>
-                <div id="ghostfinder_sidebar_close" class="fa-solid fa-circle-xmark" title="Close"></div>
+                <div class="ghostfinder_sidebar_controls">
+                    <div id="ghostfinder_sidebar_refresh" class="fa-solid fa-rotate interactable" title="Refresh"></div>
+                    <div id="ghostfinder_sidebar_close" class="fa-solid fa-circle-xmark interactable" title="Close"></div>
+                </div>
             </div>
             <div id="ghostfinder_sidebar_list" class="ghostfinder_sidebar_list"></div>
         </div>
@@ -182,6 +188,7 @@ function createSidebar() {
     $('body').append(sidebar);
     
     $('#ghostfinder_sidebar_close').on('click', closeSidebar);
+    $('#ghostfinder_sidebar_refresh').on('click', updateSidebarPanel);
     
     // Update when chat changes
     eventSource.on(event_types.CHAT_CHANGED, updateSidebarPanel);
@@ -189,7 +196,7 @@ function createSidebar() {
     eventSource.on(event_types.MESSAGE_DELETED, updateSidebarPanel);
     eventSource.on(event_types.MESSAGE_EDITED, updateSidebarPanel);
     
-    console.log(`[${extensionName}] Sidebar created`);
+    console.log(`[${extensionName}] Panel created`);
 }
 
 jQuery(async () => {
