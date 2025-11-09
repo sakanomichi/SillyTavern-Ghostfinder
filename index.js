@@ -77,7 +77,9 @@ function jumpToBoundary(mesId) {
         targetElement[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
         toastr.success(`Jumped to message #${mesId}`, 'Ghostfinder');
     } else {
-        toastr.warning(`Message #${mesId} not loaded. Scroll up to load more messages.`, 'Ghostfinder');
+        // Message not loaded - scroll to top to load more messages
+        $('#chat').animate({ scrollTop: 0 }, 'smooth');
+        toastr.info(`Message #${mesId} not loaded. Scrolled to top - click "Show More Messages" to load earlier messages.`, 'Ghostfinder');
     }
 }
 
@@ -135,6 +137,42 @@ function onLanternClick() {
     }
 }
 
+// Open sidebar panel (for Extensions menu button)
+function openSidebar() {
+    updateSidebarPanel();
+    $('#ghostfinder_sidebar').addClass('ghostfinder_open');
+}
+
+function addExtensionsMenuButton() {
+    // Remove existing button
+    $('#ghostfinder_menu_button').remove();
+    
+    // Don't check enabled setting - always add menu button
+    
+    // Select the Extensions dropdown menu
+    const $extensions_menu = $('#extensionsMenu');
+    if (!$extensions_menu.length) {
+        console.log(`[${extensionName}] Extensions menu not found`);
+        return;
+    }
+    
+    // Create button element
+    const $button = $(`
+        <div id="ghostfinder_menu_button" class="list-group-item flex-container flexGap5 interactable" title="Show Boundary Index" tabindex="0">
+            <i class="fa-solid fa-ghost"></i>
+            <span>Show Boundary Index</span>
+        </div>
+    `);
+    
+    // Append to extensions menu
+    $button.appendTo($extensions_menu);
+    
+    // Set click handler
+    $button.on('click', openSidebar);
+    
+    console.log(`[${extensionName}] Menu button added to Extensions dropdown`);
+}
+
 function addLanternButton() {
     if (!extension_settings[extensionName].enabled) {
         $('#ghostfinder_button').remove();
@@ -165,15 +203,16 @@ function addLanternButton() {
 
 // Create sidebar panel
 function createSidebar() {
+    // Check if sidebar is currently open before removing
+    const wasOpen = $('#ghostfinder_sidebar').hasClass('ghostfinder_open');
+    
     // Remove existing sidebar if any
     $('#ghostfinder_sidebar').remove();
     
-    if (!extension_settings[extensionName].enabled || !extension_settings[extensionName].showIndex) {
-        return;
-    }
+    // Always create sidebar - don't check enabled setting
     
     const sidebar = $(`
-        <div id="ghostfinder_sidebar" class="ghostfinder_sidebar">
+        <div id="ghostfinder_sidebar" class="ghostfinder_sidebar ${wasOpen ? 'ghostfinder_open' : ''}">
             <div class="ghostfinder_sidebar_header">
                 <h3>Boundary Messages</h3>
                 <div class="ghostfinder_sidebar_controls">
@@ -190,13 +229,60 @@ function createSidebar() {
     $('#ghostfinder_sidebar_close').on('click', closeSidebar);
     $('#ghostfinder_sidebar_refresh').on('click', updateSidebarPanel);
     
+    // If it was open, update the panel content
+    if (wasOpen) {
+        updateSidebarPanel();
+    }
+    
     // Update when chat changes
     eventSource.on(event_types.CHAT_CHANGED, updateSidebarPanel);
     eventSource.on(event_types.MESSAGE_RECEIVED, updateSidebarPanel);
     eventSource.on(event_types.MESSAGE_DELETED, updateSidebarPanel);
     eventSource.on(event_types.MESSAGE_EDITED, updateSidebarPanel);
+    eventSource.on(event_types.MESSAGE_UPDATED, updateSidebarPanel);
+    eventSource.on(event_types.MESSAGE_SWIPED, updateSidebarPanel);
+    eventSource.on(event_types.CHAT_UPDATED, updateSidebarPanel);
     
     console.log(`[${extensionName}] Panel created`);
+}
+
+// Add MutationObserver to detect hide/unhide operations
+function setupHideUnhideObserver() {
+    const chatContainer = document.getElementById('chat');
+    if (!chatContainer) {
+        console.log(`[${extensionName}] Chat container not found for observer`);
+        return;
+    }
+    
+    // Debounce the update to avoid excessive calls
+    let updateTimeout;
+    const debouncedUpdate = () => {
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(() => {
+            console.log(`[${extensionName}] Detected hide/unhide operation`);
+            updateSidebarPanel();
+        }, 100);
+    };
+    
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            // Check if is_system attribute changed on any message
+            if (mutation.type === 'attributes' && 
+                mutation.attributeName === 'is_system' &&
+                mutation.target.classList.contains('mes')) {
+                debouncedUpdate();
+                break;
+            }
+        }
+    });
+    
+    observer.observe(chatContainer, {
+        attributes: true,
+        attributeFilter: ['is_system'],
+        subtree: true
+    });
+    
+    console.log(`[${extensionName}] Hide/unhide observer started`);
 }
 
 jQuery(async () => {
@@ -217,6 +303,7 @@ jQuery(async () => {
             extension_settings[extensionName].enabled = value;
             saveSettingsDebounced();
             addLanternButton();
+            addExtensionsMenuButton();
             createSidebar();
         });
         
@@ -238,7 +325,9 @@ jQuery(async () => {
         $("#ghostfinder_show_index").prop("checked", extension_settings[extensionName].showIndex);
         
         addLanternButton();
+        addExtensionsMenuButton();
         createSidebar();
+        setupHideUnhideObserver(); // Add this line
        
         console.log(`[${extensionName}] ✅ Loaded successfully`);
     } catch (error) {
