@@ -232,11 +232,14 @@ function createSidebar() {
         updateSidebarPanel();
     }
     
-    // Update when chat changes
+    // Update when chat changes - listen to more events
     eventSource.on(event_types.CHAT_CHANGED, updateSidebarPanel);
     eventSource.on(event_types.MESSAGE_RECEIVED, updateSidebarPanel);
     eventSource.on(event_types.MESSAGE_DELETED, updateSidebarPanel);
     eventSource.on(event_types.MESSAGE_EDITED, updateSidebarPanel);
+    eventSource.on(event_types.MESSAGE_UPDATED, updateSidebarPanel); // Add this
+    eventSource.on(event_types.MESSAGE_SWIPED, updateSidebarPanel); // Add this
+    eventSource.on(event_types.CHAT_UPDATED, updateSidebarPanel); // Add this
     
     console.log(`[${extensionName}] Panel created`);
 }
