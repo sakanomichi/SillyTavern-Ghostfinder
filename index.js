@@ -199,12 +199,12 @@ function addLanternButton() {
     console.log(`[${extensionName}] Lantern button added`);
 }
 
-// Create sidebar panel
 function createSidebar() {
     // Remove existing sidebar if any
     $('#ghostfinder_sidebar').remove();
     
-    if (!extension_settings[extensionName].enabled || !extension_settings[extensionName].showIndex) {
+    // Only check if extension is enabled, not showIndex
+    if (!extension_settings[extensionName].enabled) {
         return;
     }
     
