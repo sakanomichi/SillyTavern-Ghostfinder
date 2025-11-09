@@ -232,16 +232,55 @@ function createSidebar() {
         updateSidebarPanel();
     }
     
-    // Update when chat changes - listen to more events
+    // Update when chat changes
     eventSource.on(event_types.CHAT_CHANGED, updateSidebarPanel);
     eventSource.on(event_types.MESSAGE_RECEIVED, updateSidebarPanel);
     eventSource.on(event_types.MESSAGE_DELETED, updateSidebarPanel);
     eventSource.on(event_types.MESSAGE_EDITED, updateSidebarPanel);
-    eventSource.on(event_types.MESSAGE_UPDATED, updateSidebarPanel); // Add this
-    eventSource.on(event_types.MESSAGE_SWIPED, updateSidebarPanel); // Add this
-    eventSource.on(event_types.CHAT_UPDATED, updateSidebarPanel); // Add this
+    eventSource.on(event_types.MESSAGE_UPDATED, updateSidebarPanel);
+    eventSource.on(event_types.MESSAGE_SWIPED, updateSidebarPanel);
+    eventSource.on(event_types.CHAT_UPDATED, updateSidebarPanel);
     
     console.log(`[${extensionName}] Panel created`);
+}
+
+// Add MutationObserver to detect hide/unhide operations
+function setupHideUnhideObserver() {
+    const chatContainer = document.getElementById('chat');
+    if (!chatContainer) {
+        console.log(`[${extensionName}] Chat container not found for observer`);
+        return;
+    }
+    
+    // Debounce the update to avoid excessive calls
+    let updateTimeout;
+    const debouncedUpdate = () => {
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(() => {
+            console.log(`[${extensionName}] Detected hide/unhide operation`);
+            updateSidebarPanel();
+        }, 100);
+    };
+    
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            // Check if is_system attribute changed on any message
+            if (mutation.type === 'attributes' && 
+                mutation.attributeName === 'is_system' &&
+                mutation.target.classList.contains('mes')) {
+                debouncedUpdate();
+                break;
+            }
+        }
+    });
+    
+    observer.observe(chatContainer, {
+        attributes: true,
+        attributeFilter: ['is_system'],
+        subtree: true
+    });
+    
+    console.log(`[${extensionName}] Hide/unhide observer started`);
 }
 
 jQuery(async () => {
@@ -262,7 +301,7 @@ jQuery(async () => {
             extension_settings[extensionName].enabled = value;
             saveSettingsDebounced();
             addLanternButton();
-            addExtensionsMenuButton(); // Add this line
+            addExtensionsMenuButton();
             createSidebar();
         });
         
@@ -286,6 +325,7 @@ jQuery(async () => {
         addLanternButton();
         addExtensionsMenuButton();
         createSidebar();
+        setupHideUnhideObserver(); // Add this line
        
         console.log(`[${extensionName}] ✅ Loaded successfully`);
     } catch (error) {
