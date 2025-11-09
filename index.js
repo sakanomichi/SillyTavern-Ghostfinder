@@ -121,7 +121,7 @@ function closeSidebar() {
 }
 
 function onLanternClick() {
-    console.log(`[${extensionName}] Candle button clicked`);
+    console.log(`[${extensionName}] Lantern button clicked`);
     
     // If showIndex is enabled, toggle sidebar instead of jumping
     if (extension_settings[extensionName].showIndex) {
@@ -140,12 +140,25 @@ function addLanternButton() {
     
     if ($('#ghostfinder_button').length > 0) return;
     
-    const button = $('<div id="ghostfinder_button" class="fa-solid fa-candle interactable" title="Find previous boundary" tabindex="0"></div>');
+    const button = $(`
+        <div id="ghostfinder_button" class="interactable" title="Find previous boundary" tabindex="0" role="button">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2 C 9 2, 7 3.5, 7 5 L 7 6 L 17 6 L 17 5 C 17 3.5, 15 2, 12 2 Z"/>
+                <path d="M 8 6 L 6 10 C 6 10, 5.5 13, 5.5 15 C 5.5 17, 6 18, 7 19 L 17 19 C 18 18, 18.5 17, 18.5 15 C 18.5 13, 18 10, 18 10 L 16 6 Z"/>
+                <path d="M 12 10 C 12 10, 10.5 12, 10.5 14 C 10.5 15.5, 11.2 16.5, 12 16.5 C 12.8 16.5, 13.5 15.5, 13.5 14 C 13.5 12, 12 10, 12 10 Z"/>
+                <path d="M 12 11.5 C 12 11.5, 11.2 12.8, 11.2 13.8 C 11.2 14.5, 11.5 15, 12 15 C 12.5 15, 12.8 14.5, 12.8 13.8 C 12.8 12.8, 12 11.5, 12 11.5 Z"/>
+                <rect x="7" y="19" width="10" height="3" rx="1"/>
+                <circle cx="18.5" cy="20.5" r="1"/>
+                <line x1="17.5" y1="20.5" x2="19.5" y2="20.5"/>
+            </svg>
+        </div>
+    `);
     button.on('click', onLanternClick);
     
     $('#rightSendForm').prepend(button);
     
-    console.log(`[${extensionName}] Candle button added`);
+    console.log(`[${extensionName}] Lantern button added`);
+}
 }
 
 // Create sidebar panel
