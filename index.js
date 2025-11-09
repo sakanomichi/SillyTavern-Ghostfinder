@@ -145,7 +145,7 @@ function addExtensionsMenuButton() {
     // Remove existing button
     $('#ghostfinder_menu_button').remove();
     
-    if (!extension_settings[extensionName].enabled) return;
+    // Don't check enabled setting - always add menu button
     
     // Select the Extensions dropdown menu
     const $extensions_menu = $('#extensionsMenu');
@@ -203,10 +203,7 @@ function createSidebar() {
     // Remove existing sidebar if any
     $('#ghostfinder_sidebar').remove();
     
-    // Only check if extension is enabled, not showIndex
-    if (!extension_settings[extensionName].enabled) {
-        return;
-    }
+    // Always create sidebar - don't check enabled setting
     
     const sidebar = $(`
         <div id="ghostfinder_sidebar" class="ghostfinder_sidebar">
@@ -275,7 +272,7 @@ jQuery(async () => {
         $("#ghostfinder_show_index").prop("checked", extension_settings[extensionName].showIndex);
         
         addLanternButton();
-        addExtensionsMenuButton(); // Add this line
+        addExtensionsMenuButton();
         createSidebar();
        
         console.log(`[${extensionName}] ✅ Loaded successfully`);
