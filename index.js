@@ -135,6 +135,42 @@ function onLanternClick() {
     }
 }
 
+// Open sidebar panel (for Extensions menu button)
+function openSidebar() {
+    updateSidebarPanel();
+    $('#ghostfinder_sidebar').addClass('ghostfinder_open');
+}
+
+function addExtensionsMenuButton() {
+    // Remove existing button
+    $('#ghostfinder_menu_button').remove();
+    
+    if (!extension_settings[extensionName].enabled) return;
+    
+    // Select the Extensions dropdown menu
+    const $extensions_menu = $('#extensionsMenu');
+    if (!$extensions_menu.length) {
+        console.log(`[${extensionName}] Extensions menu not found`);
+        return;
+    }
+    
+    // Create button element
+    const $button = $(`
+        <div id="ghostfinder_menu_button" class="list-group-item flex-container flexGap5 interactable" title="Show Boundary Index" tabindex="0">
+            <i class="fa-solid fa-ghost"></i>
+            <span>Show Boundary Index</span>
+        </div>
+    `);
+    
+    // Append to extensions menu
+    $button.appendTo($extensions_menu);
+    
+    // Set click handler
+    $button.on('click', openSidebar);
+    
+    console.log(`[${extensionName}] Menu button added to Extensions dropdown`);
+}
+
 function addLanternButton() {
     if (!extension_settings[extensionName].enabled) {
         $('#ghostfinder_button').remove();
@@ -217,6 +253,7 @@ jQuery(async () => {
             extension_settings[extensionName].enabled = value;
             saveSettingsDebounced();
             addLanternButton();
+            addExtensionsMenuButton(); // Add this line
             createSidebar();
         });
         
@@ -238,6 +275,7 @@ jQuery(async () => {
         $("#ghostfinder_show_index").prop("checked", extension_settings[extensionName].showIndex);
         
         addLanternButton();
+        addExtensionsMenuButton(); // Add this line
         createSidebar();
        
         console.log(`[${extensionName}] ✅ Loaded successfully`);
