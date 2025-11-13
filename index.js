@@ -7,7 +7,8 @@ const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 
 const defaultSettings = { 
     enabled: true,
-    showIndex: false
+    showIndex: false,
+    findEnd: false  // Add this
 };
 
 // Find ALL boundary messages from context.chat (includes unloaded)
@@ -15,20 +16,29 @@ function findAllBoundaries() {
     const context = getContext();
     const allMessages = context.chat || [];
     const boundaries = [];
+    const findEnd = extension_settings[extensionName].findEnd;
     let lastWasHidden = false;
     
     for (let i = 0; i < allMessages.length; i++) {
         const msg = allMessages[i];
         const isHidden = msg.is_system === true;
         
-        if (!isHidden && lastWasHidden) {
-            boundaries.push(i);
+        if (findEnd) {
+            // Find LAST unhidden before hidden section (end of boundary)
+            if (isHidden && !lastWasHidden && i > 0) {
+                boundaries.push(i - 1);
+            }
+        } else {
+            // Find FIRST unhidden after hidden section (start of boundary)
+            if (!isHidden && lastWasHidden) {
+                boundaries.push(i);
+            }
         }
         
         lastWasHidden = isHidden;
     }
     
-    console.log(`[${extensionName}] Found ${boundaries.length} boundaries (all):`, boundaries);
+    console.log(`[${extensionName}] Found ${boundaries.length} boundaries (${findEnd ? 'ends' : 'starts'}):`, boundaries);
     return boundaries;
 }
 
@@ -74,18 +84,11 @@ function jumpToBoundary(mesId) {
     const targetElement = $(`.mes[mesid="${mesId}"]`);
     
     if (targetElement.length > 0) {
-        // Use jQuery animate instead of scrollIntoView to prevent layout issues
-        const chatContainer = $('#chat');
-        const targetOffset = targetElement.offset().top - chatContainer.offset().top + chatContainer.scrollTop();
-        
-        chatContainer.animate({
-            scrollTop: targetOffset - 100 // Offset by 100px to give some breathing room
-        }, 500, 'swing');
-        
+        targetElement[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
         toastr.success(`Jumped to message #${mesId}`, 'Ghostfinder');
     } else {
         // Message not loaded - scroll to top to load more messages
-        $('#chat').animate({ scrollTop: 0 }, 500, 'swing');
+        $('#chat').animate({ scrollTop: 0 }, 'smooth');
         toastr.info(`Message #${mesId} not loaded. Scrolled to top - click "Show More Messages" to load earlier messages.`, 'Ghostfinder');
     }
 }
@@ -188,8 +191,11 @@ function addLanternButton() {
     
     if ($('#ghostfinder_button').length > 0) return;
     
+    const findEnd = extension_settings[extensionName].findEnd;
+    const tooltipText = findEnd ? 'Find last message before hidden sections' : 'Find previous boundary';
+    
     const button = $(`
-        <div id="ghostfinder_button" class="interactable" title="Find previous boundary" tabindex="0" role="button">
+        <div id="ghostfinder_button" class="interactable" title="${tooltipText}" tabindex="0" role="button">
             <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2 C 9 2, 7 3.5, 7 5 L 7 6 L 17 6 L 17 5 C 17 3.5, 15 2, 12 2 Z"/>
                 <path d="M 8 6 L 6 10 C 6 10, 5.5 13, 5.5 15 C 5.5 17, 6 18, 7 19 L 17 19 C 18 18, 18.5 17, 18.5 15 C 18.5 13, 18 10, 18 10 L 16 6 Z"/>
@@ -209,6 +215,7 @@ function addLanternButton() {
 }
 
 // Create sidebar panel
+// Create sidebar panel
 function createSidebar() {
     // Check if sidebar is currently open before removing
     const wasOpen = $('#ghostfinder_sidebar').hasClass('ghostfinder_open');
@@ -217,11 +224,16 @@ function createSidebar() {
     $('#ghostfinder_sidebar').remove();
     
     // Always create sidebar - don't check enabled setting
+    const findEnd = extension_settings[extensionName].findEnd;
+    const headerText = findEnd ? 'Last Messages Before Hidden' : 'First Messages After Hidden';
     
     const sidebar = $(`
         <div id="ghostfinder_sidebar" class="ghostfinder_sidebar ${wasOpen ? 'ghostfinder_open' : ''}">
             <div class="ghostfinder_sidebar_header">
-                <h3>Boundary Messages</h3>
+                <div>
+                    <h3>Boundary Messages</h3>
+                    <small class="ghostfinder_mode_text">${headerText}</small>
+                </div>
                 <div class="ghostfinder_sidebar_controls">
                     <div id="ghostfinder_sidebar_refresh" class="fa-solid fa-rotate interactable" title="Refresh"></div>
                     <div id="ghostfinder_sidebar_close" class="fa-solid fa-circle-xmark interactable" title="Close"></div>
@@ -327,10 +339,24 @@ jQuery(async () => {
                 $('#ghostfinder_button').attr('title', 'Find previous boundary');
             }
         });
-        
-        $("#ghostfinder_enabled").prop("checked", extension_settings[extensionName].enabled);
-        $("#ghostfinder_show_index").prop("checked", extension_settings[extensionName].showIndex);
-        
+		
+        $("#ghostfinder_find_end").on("change", function() {
+			const value = $(this).prop("checked");
+			extension_settings[extensionName].findEnd = value;
+			saveSettingsDebounced();
+			updateSidebarPanel(); // Refresh panel if open
+			createSidebar(); // Recreate sidebar to update header text
+			
+			// Update button tooltip
+			const tooltipText = value ? 'Find last message before hidden sections' : 'Find previous boundary';
+			$('#ghostfinder_button').attr('title', tooltipText);
+		});
+
+		// Don't forget to load the setting
+		$("#ghostfinder_enabled").prop("checked", extension_settings[extensionName].enabled);
+		$("#ghostfinder_show_index").prop("checked", extension_settings[extensionName].showIndex);
+		$("#ghostfinder_find_end").prop("checked", extension_settings[extensionName].findEnd);
+
         addLanternButton();
         addExtensionsMenuButton();
         createSidebar();
