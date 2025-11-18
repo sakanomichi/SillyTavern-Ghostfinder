@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.2.0] - Refactoring Update
+
+### Changed
+- **Code organization and consistency:**
+  - Added `extensionDisplayName` constant for consistent naming
+  - Implemented `log()` and `info()` helper functions for better debugging
+  - Restructured initialization flow for clarity
+  - Improved settings initialization with `structuredClone()`
+  - Separated event handlers into dedicated functions
+  - Better error handling with descriptive messages
+  
+- **Settings improvements:**
+  - Added debug mode toggle for optional detailed logging
+  - More robust settings loading and validation
+  - Cleaner checkbox state management
+  
+- **Code quality:**
+  - Consistent use of `const` vs `let`
+  - Better function documentation
+  - Improved code comments
+  - Removed redundant code
+  
+- **Manifest updates:**
+  - Added `license` field (GPL-3.0)
+  - Added `auto_update` field (false)
+  - Bumped version to 1.2.0
+
+### Notes
+This is a refactoring release that improves code quality and maintainability without changing functionality. All existing features work exactly the same way.
+
 ## [1.1.0] - 10/11/25
 
 ### Added

@@ -49,8 +49,10 @@ public/scripts/extensions/third-party/SillyTavern-Ghostfinder/
 
 Find Ghostfinder in the Extensions panel (right sidebar):
 
-- **Show Lantern Button** - Toggle visibility of the lantern button in the chat interface (on by default)
-- **Lantern Button Opens Panel** - When enabled, the lantern button opens the Boundary Index Panel instead of jumping to the previous boundary (off by default)
+- **Show Lantern Button** - Display the lantern button in the chat interface (on by default)
+- **Lantern Button Opens Panel** - When enabled, clicking the lantern button opens the Boundary Index Panel. When disabled, clicking jumps to the previous boundary (off by default)
+- **Find End of Sections** - Find the last visible message before each hidden section, instead of the first visible message after each hidden section (off by default)
+- **Enable Debug Logging** - Shows detailed information in the browser console for troubleshooting (off by default)
 
 **Note:** The Boundary Index Panel is always accessible via the Extensions menu, regardless of these settings.
 
@@ -62,11 +64,21 @@ Find Ghostfinder in the Extensions panel (right sidebar):
 - Review all conversation segments at a glance using the panel
 - Efficiently navigate long roleplays with many hidden system messages or swipes
 
+## Troubleshooting
+
+If the extension isn't working:
+
+1. Open the browser console (F12) and look for `[Ghostfinder]` messages
+2. Enable debug logging in the extension settings
+3. Verify all files are in the correct directory
+4. Try clearing your browser cache
+
 ## Tips
 
 - Use the **refresh button** in the panel after hiding/unhiding messages beyond pagination
 - Access the panel from the **Extensions menu** even when the lantern button is hidden
 - The panel shows **all** boundaries (even unloaded ones), while the lantern button navigates through loaded boundaries
+- Enable **debug logging** to see detailed information about boundary detection and navigation
 
 ## Credits
 
@@ -76,3 +88,6 @@ Created by sakanomichi using tools created by Chai/Ultraviolenc!
 
 See [CHANGELOG.md](CHANGELOG.md) for version history and detailed changes.
 
+## License
+
+GPL-3.0 - See [LICENSE](LICENSE) file for details.

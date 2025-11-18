@@ -1,12 +1,13 @@
 {
-  "display_name": "Ghostfinder",
-  "loading_order": 100,
-  "requires": [],
-  "optional": [],
-  "js": "index.js",
-  "css": "style.css",
-  "author": "sakanomichi",
-  "version": "1.1.0",
-  "homePage": "https://github.com/sakanomichi/SillyTavern-Ghostfinder"
-
+    "display_name": "Ghostfinder",
+    "loading_order": 100,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "sakanomichi",
+    "version": "1.2.0",
+    "license": "GPL-3.0",
+    "homePage": "https://github.com/sakanomichi/SillyTavern-Ghostfinder",
+    "auto_update": false
 }

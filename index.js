@@ -1,15 +1,77 @@
 import { extension_settings, getContext } from "../../../extensions.js";
-import { saveSettingsDebounced } from "../../../../script.js";
-import { eventSource, event_types } from "../../../../script.js";
+import { saveSettingsDebounced, eventSource, event_types } from "../../../../script.js";
 
 const extensionName = "SillyTavern-Ghostfinder";
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
+const extensionDisplayName = "Ghostfinder";
 
+// Helper for debug logging
+function log(...args) {
+    if (extension_settings[extensionName]?.debugMode) {
+        console.log(`[${extensionDisplayName}]`, ...args);
+    }
+}
+
+// Helper for regular logging
+function info(...args) {
+    console.log(`[${extensionDisplayName}]`, ...args);
+}
+
+// Default settings
 const defaultSettings = { 
     enabled: true,
     showIndex: false,
-    findEnd: false  // Add this
+    findEnd: false,
+    debugMode: false
 };
+
+// Initialize settings
+function loadSettings() {
+    // Initialize with defaults if doesn't exist
+    if (!extension_settings[extensionName]) {
+        extension_settings[extensionName] = structuredClone(defaultSettings);
+    }
+    
+    // Ensure all settings exist
+    if (extension_settings[extensionName].enabled === undefined) {
+        extension_settings[extensionName].enabled = true;
+    }
+    
+    if (extension_settings[extensionName].showIndex === undefined) {
+        extension_settings[extensionName].showIndex = false;
+    }
+    
+    if (extension_settings[extensionName].findEnd === undefined) {
+        extension_settings[extensionName].findEnd = false;
+    }
+    
+    if (extension_settings[extensionName].debugMode === undefined) {
+        extension_settings[extensionName].debugMode = false;
+    }
+    
+    // Update UI if it exists
+    const enabledCheckbox = document.querySelector('#ghostfinder_enabled');
+    if (enabledCheckbox) {
+        enabledCheckbox.checked = extension_settings[extensionName].enabled;
+    }
+    
+    const showIndexCheckbox = document.querySelector('#ghostfinder_show_index');
+    if (showIndexCheckbox) {
+        showIndexCheckbox.checked = extension_settings[extensionName].showIndex;
+    }
+    
+    const findEndCheckbox = document.querySelector('#ghostfinder_find_end');
+    if (findEndCheckbox) {
+        findEndCheckbox.checked = extension_settings[extensionName].findEnd;
+    }
+    
+    const debugCheckbox = document.querySelector('#ghostfinder_debug');
+    if (debugCheckbox) {
+        debugCheckbox.checked = extension_settings[extensionName].debugMode;
+    }
+    
+    log("Settings loaded:", extension_settings[extensionName]);
+}
 
 // Find ALL boundary messages from context.chat (includes unloaded)
 function findAllBoundaries() {
@@ -38,7 +100,7 @@ function findAllBoundaries() {
         lastWasHidden = isHidden;
     }
     
-    console.log(`[${extensionName}] Found ${boundaries.length} boundaries (${findEnd ? 'ends' : 'starts'}):`, boundaries);
+    log(`Found ${boundaries.length} boundaries (${findEnd ? 'ends' : 'starts'}):`, boundaries);
     return boundaries;
 }
 
@@ -75,9 +137,10 @@ function findNextBoundary() {
     return null;
 }
 
+// Jump to a specific boundary message
 function jumpToBoundary(mesId) {
     if (mesId === null || mesId === undefined) {
-        toastr.info('No boundary found', 'Ghostfinder');
+        toastr.info('No boundary found', extensionDisplayName);
         return;
     }
     
@@ -85,11 +148,13 @@ function jumpToBoundary(mesId) {
     
     if (targetElement.length > 0) {
         targetElement[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
-        toastr.success(`Jumped to message #${mesId}`, 'Ghostfinder');
+        toastr.success(`Jumped to message #${mesId}`, extensionDisplayName);
+        log(`Jumped to message #${mesId}`);
     } else {
         // Message not loaded - scroll to top to load more messages
         $('#chat').animate({ scrollTop: 0 }, 'smooth');
-        toastr.info(`Message #${mesId} not loaded. Scrolled to top - click "Show More Messages" to load earlier messages.`, 'Ghostfinder');
+        toastr.info(`Message #${mesId} not loaded. Scrolled to top - click "Show More Messages" to load earlier messages.`, extensionDisplayName);
+        log(`Message #${mesId} not loaded, scrolled to top`);
     }
 }
 
@@ -98,14 +163,20 @@ function updateSidebarPanel() {
     const boundaries = findAllBoundaries();
     const listContainer = $('#ghostfinder_sidebar_list');
     
-    if (listContainer.length === 0) return;
+    if (listContainer.length === 0) {
+        log("Sidebar list container not found");
+        return;
+    }
     
     listContainer.empty();
     
     if (boundaries.length === 0) {
         listContainer.append('<div class="ghostfinder_no_boundaries">No boundaries found</div>');
+        log("No boundaries found");
         return;
     }
+    
+    log(`Updating sidebar with ${boundaries.length} boundaries`);
     
     boundaries.forEach(mesId => {
         const item = $('<div class="ghostfinder_boundary_item menu_button"></div>');
@@ -124,19 +195,30 @@ function toggleSidebar() {
     
     if (sidebar.hasClass('ghostfinder_open')) {
         sidebar.removeClass('ghostfinder_open');
+        log("Sidebar closed");
     } else {
         updateSidebarPanel();
         sidebar.addClass('ghostfinder_open');
+        log("Sidebar opened");
     }
 }
 
 // Close sidebar
 function closeSidebar() {
     $('#ghostfinder_sidebar').removeClass('ghostfinder_open');
+    log("Sidebar closed");
 }
 
+// Open sidebar panel (for Extensions menu button)
+function openSidebar() {
+    updateSidebarPanel();
+    $('#ghostfinder_sidebar').addClass('ghostfinder_open');
+    log("Sidebar opened from menu");
+}
+
+// Handle lantern button click
 function onLanternClick() {
-    console.log(`[${extensionName}] Lantern button clicked`);
+    log("Lantern button clicked");
     
     // If showIndex is enabled, toggle sidebar instead of jumping
     if (extension_settings[extensionName].showIndex) {
@@ -147,22 +229,15 @@ function onLanternClick() {
     }
 }
 
-// Open sidebar panel (for Extensions menu button)
-function openSidebar() {
-    updateSidebarPanel();
-    $('#ghostfinder_sidebar').addClass('ghostfinder_open');
-}
-
+// Add Extensions menu button
 function addExtensionsMenuButton() {
     // Remove existing button
     $('#ghostfinder_menu_button').remove();
     
-    // Don't check enabled setting - always add menu button
-    
     // Select the Extensions dropdown menu
     const $extensions_menu = $('#extensionsMenu');
     if (!$extensions_menu.length) {
-        console.log(`[${extensionName}] Extensions menu not found`);
+        log("Extensions menu not found");
         return;
     }
     
@@ -180,16 +255,21 @@ function addExtensionsMenuButton() {
     // Set click handler
     $button.on('click', openSidebar);
     
-    console.log(`[${extensionName}] Menu button added to Extensions dropdown`);
+    log("Menu button added to Extensions dropdown");
 }
 
+// Add lantern button to chat interface
 function addLanternButton() {
     if (!extension_settings[extensionName].enabled) {
         $('#ghostfinder_button').remove();
+        log("Lantern button removed (extension disabled)");
         return;
     }
     
-    if ($('#ghostfinder_button').length > 0) return;
+    if ($('#ghostfinder_button').length > 0) {
+        log("Lantern button already exists");
+        return;
+    }
     
     const findEnd = extension_settings[extensionName].findEnd;
     const tooltipText = findEnd ? 'Find last message before hidden sections' : 'Find previous boundary';
@@ -211,10 +291,9 @@ function addLanternButton() {
     
     $('#rightSendForm').prepend(button);
     
-    console.log(`[${extensionName}] Lantern button added`);
+    log("Lantern button added");
 }
 
-// Create sidebar panel
 // Create sidebar panel
 function createSidebar() {
     // Check if sidebar is currently open before removing
@@ -223,7 +302,6 @@ function createSidebar() {
     // Remove existing sidebar if any
     $('#ghostfinder_sidebar').remove();
     
-    // Always create sidebar - don't check enabled setting
     const findEnd = extension_settings[extensionName].findEnd;
     const headerText = findEnd ? 'Last Messages Before Hidden' : 'First Messages After Hidden';
     
@@ -253,23 +331,55 @@ function createSidebar() {
         updateSidebarPanel();
     }
     
-    // Update when chat changes
-    eventSource.on(event_types.CHAT_CHANGED, updateSidebarPanel);
-    eventSource.on(event_types.MESSAGE_RECEIVED, updateSidebarPanel);
-    eventSource.on(event_types.MESSAGE_DELETED, updateSidebarPanel);
-    eventSource.on(event_types.MESSAGE_EDITED, updateSidebarPanel);
-    eventSource.on(event_types.MESSAGE_UPDATED, updateSidebarPanel);
-    eventSource.on(event_types.MESSAGE_SWIPED, updateSidebarPanel);
-    eventSource.on(event_types.CHAT_UPDATED, updateSidebarPanel);
+    log("Sidebar created");
+}
+
+// Setup event listeners for chat changes
+function setupEventListeners() {
+    log("Registering event listeners");
     
-    console.log(`[${extensionName}] Panel created`);
+    // Update when chat changes
+    eventSource.on(event_types.CHAT_CHANGED, () => {
+        log("CHAT_CHANGED event");
+        updateSidebarPanel();
+    });
+    
+    eventSource.on(event_types.MESSAGE_RECEIVED, () => {
+        log("MESSAGE_RECEIVED event");
+        updateSidebarPanel();
+    });
+    
+    eventSource.on(event_types.MESSAGE_DELETED, () => {
+        log("MESSAGE_DELETED event");
+        updateSidebarPanel();
+    });
+    
+    eventSource.on(event_types.MESSAGE_EDITED, () => {
+        log("MESSAGE_EDITED event");
+        updateSidebarPanel();
+    });
+    
+    eventSource.on(event_types.MESSAGE_UPDATED, () => {
+        log("MESSAGE_UPDATED event");
+        updateSidebarPanel();
+    });
+    
+    eventSource.on(event_types.MESSAGE_SWIPED, () => {
+        log("MESSAGE_SWIPED event");
+        updateSidebarPanel();
+    });
+    
+    eventSource.on(event_types.CHAT_UPDATED, () => {
+        log("CHAT_UPDATED event");
+        updateSidebarPanel();
+    });
 }
 
 // Add MutationObserver to detect hide/unhide operations
 function setupHideUnhideObserver() {
     const chatContainer = document.getElementById('chat');
     if (!chatContainer) {
-        console.log(`[${extensionName}] Chat container not found for observer`);
+        log("Chat container not found for observer");
         return;
     }
     
@@ -278,7 +388,7 @@ function setupHideUnhideObserver() {
     const debouncedUpdate = () => {
         clearTimeout(updateTimeout);
         updateTimeout = setTimeout(() => {
-            console.log(`[${extensionName}] Detected hide/unhide operation`);
+            log("Detected hide/unhide operation");
             updateSidebarPanel();
         }, 100);
     };
@@ -301,69 +411,105 @@ function setupHideUnhideObserver() {
         subtree: true
     });
     
-    console.log(`[${extensionName}] Hide/unhide observer started`);
+    log("Hide/unhide observer started");
 }
 
-jQuery(async () => {
-    console.log(`[${extensionName}] Loading...`);
-   
+// Handle enabled toggle
+function onEnabledChange(event) {
+    const value = Boolean($(event.target).prop("checked"));
+    extension_settings[extensionName].enabled = value;
+    saveSettingsDebounced();
+    info(`Extension ${value ? 'enabled' : 'disabled'}`);
+    
+    addLanternButton();
+    addExtensionsMenuButton();
+    createSidebar();
+}
+
+// Handle show index toggle
+function onShowIndexChange(event) {
+    const value = Boolean($(event.target).prop("checked"));
+    extension_settings[extensionName].showIndex = value;
+    saveSettingsDebounced();
+    info(`Show index panel ${value ? 'enabled' : 'disabled'}`);
+    
+    createSidebar();
+    
+    // Update button tooltip
+    if (value) {
+        $('#ghostfinder_button').attr('title', 'Show boundary index');
+    } else {
+        const findEnd = extension_settings[extensionName].findEnd;
+        const tooltipText = findEnd ? 'Find last message before hidden sections' : 'Find previous boundary';
+        $('#ghostfinder_button').attr('title', tooltipText);
+    }
+}
+
+// Handle find end toggle
+function onFindEndChange(event) {
+    const value = Boolean($(event.target).prop("checked"));
+    extension_settings[extensionName].findEnd = value;
+    saveSettingsDebounced();
+    info(`Find end mode ${value ? 'enabled' : 'disabled'}`);
+    
+    updateSidebarPanel();
+    createSidebar();
+    
+    // Update button tooltip
+    const tooltipText = value ? 'Find last message before hidden sections' : 'Find previous boundary';
+    $('#ghostfinder_button').attr('title', tooltipText);
+}
+
+// Handle debug mode toggle
+function onDebugModeChange(event) {
+    const value = Boolean($(event.target).prop("checked"));
+    extension_settings[extensionName].debugMode = value;
+    saveSettingsDebounced();
+    info(`Debug mode ${value ? 'enabled' : 'disabled'}`);
+}
+
+// Initialize the extension
+async function init() {
+    info("Initializing...");
+    
+    loadSettings();
+    
+    // Load settings UI
     try {
-        if (!extension_settings[extensionName]) {
-            extension_settings[extensionName] = Object.assign({}, defaultSettings);
-        }
-        console.log(`[${extensionName}] Settings initialized:`, extension_settings[extensionName]);
-       
         const settingsHtml = await $.get(`${extensionFolderPath}/settings.html`);
         $("#extensions_settings2").append(settingsHtml);
-        console.log(`[${extensionName}] HTML appended`);
-       
-        $("#ghostfinder_enabled").on("change", function() {
-            const value = $(this).prop("checked");
-            extension_settings[extensionName].enabled = value;
-            saveSettingsDebounced();
-            addLanternButton();
-            addExtensionsMenuButton();
-            createSidebar();
-        });
         
-        $("#ghostfinder_show_index").on("change", function() {
-            const value = $(this).prop("checked");
-            extension_settings[extensionName].showIndex = value;
-            saveSettingsDebounced();
-            createSidebar();
-            
-            // Update button tooltip
-            if (value) {
-                $('#ghostfinder_button').attr('title', 'Show boundary index');
-            } else {
-                $('#ghostfinder_button').attr('title', 'Find previous boundary');
-            }
-        });
-		
-        $("#ghostfinder_find_end").on("change", function() {
-			const value = $(this).prop("checked");
-			extension_settings[extensionName].findEnd = value;
-			saveSettingsDebounced();
-			updateSidebarPanel(); // Refresh panel if open
-			createSidebar(); // Recreate sidebar to update header text
-			
-			// Update button tooltip
-			const tooltipText = value ? 'Find last message before hidden sections' : 'Find previous boundary';
-			$('#ghostfinder_button').attr('title', tooltipText);
-		});
-
-		// Don't forget to load the setting
-		$("#ghostfinder_enabled").prop("checked", extension_settings[extensionName].enabled);
-		$("#ghostfinder_show_index").prop("checked", extension_settings[extensionName].showIndex);
-		$("#ghostfinder_find_end").prop("checked", extension_settings[extensionName].findEnd);
-
-        addLanternButton();
-        addExtensionsMenuButton();
-        createSidebar();
-        setupHideUnhideObserver(); // Add this line
-       
-        console.log(`[${extensionName}] ✅ Loaded successfully`);
+        // Bind event handlers
+        $("#ghostfinder_enabled").on("change", onEnabledChange);
+        $("#ghostfinder_show_index").on("change", onShowIndexChange);
+        $("#ghostfinder_find_end").on("change", onFindEndChange);
+        $("#ghostfinder_debug").on("change", onDebugModeChange);
+        
+        // Update checkbox states
+        $("#ghostfinder_enabled").prop("checked", extension_settings[extensionName].enabled);
+        $("#ghostfinder_show_index").prop("checked", extension_settings[extensionName].showIndex);
+        $("#ghostfinder_find_end").prop("checked", extension_settings[extensionName].findEnd);
+        $("#ghostfinder_debug").prop("checked", extension_settings[extensionName].debugMode);
+        
+        log("Settings UI loaded");
     } catch (error) {
-        console.error(`[${extensionName}] ❌ Error:`, error);
+        console.error(`[${extensionDisplayName}] Failed to load settings UI:`, error);
     }
+    
+    // Wait a bit for ST to load UI elements
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Set up components
+    addLanternButton();
+    addExtensionsMenuButton();
+    createSidebar();
+    setupEventListeners();
+    setupHideUnhideObserver();
+    
+    log("Initialization complete");
+}
+
+// Register the extension
+jQuery(async () => {
+    await init();
 });

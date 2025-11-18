@@ -5,15 +5,49 @@
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
-            <label class="checkbox_label" for="ghostfinder_enabled">
-                <input id="ghostfinder_enabled" type="checkbox" />
-                <span>Show Lantern Button</span>
-            </label>
-            <label class="checkbox_label" for="ghostfinder_show_index">
-                <input id="ghostfinder_show_index" type="checkbox" />
-                <span>Lantern Button Opens Panel</span>
-            </label>
-            <small>Navigate between boundaries (first unhidden messages after hidden sections). When unchecked, the lantern button jumps to the previous boundary. Access the Boundary Index Panel anytime via the Extensions menu.</small>
+            <div class="flex-container flexFlowColumn">
+                <p>
+                    <small>Navigate between boundary messages - the first visible messages that appear after hidden sections in your chat.</small>
+                </p>
+                
+                <label class="checkbox_label" for="ghostfinder_enabled">
+                    <input id="ghostfinder_enabled" type="checkbox" />
+                    <span>Show Lantern Button</span>
+                </label>
+                <small class="notes">
+                    Display the lantern button in the chat interface.
+                </small>
+                
+                <hr class="m-t-1 m-b-1">
+                
+                <label class="checkbox_label" for="ghostfinder_show_index">
+                    <input id="ghostfinder_show_index" type="checkbox" />
+                    <span>Lantern Button Opens Panel</span>
+                </label>
+                <small class="notes">
+                    When enabled, clicking the lantern button opens the Boundary Index Panel. When disabled, clicking jumps to the previous boundary. The panel is always accessible via the Extensions menu.
+                </small>
+                
+                <hr class="m-t-1 m-b-1">
+                
+                <label class="checkbox_label" for="ghostfinder_find_end">
+                    <input id="ghostfinder_find_end" type="checkbox" />
+                    <span>Find End of Sections</span>
+                </label>
+                <small class="notes">
+                    Find the last visible message before each hidden section, instead of the first visible message after each hidden section.
+                </small>
+                
+                <hr class="m-t-1 m-b-1">
+                
+                <label class="checkbox_label" for="ghostfinder_debug">
+                    <input id="ghostfinder_debug" type="checkbox" />
+                    <span>Enable Debug Logging</span>
+                </label>
+                <small class="notes">
+                    Shows detailed information in the browser console for troubleshooting.
+                </small>
+            </div>
         </div>
     </div>
 </div>
